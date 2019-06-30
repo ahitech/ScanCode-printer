@@ -159,7 +159,6 @@ void AppView::KeyDown(const char *bytes, int32 numBytes)
 				break;
 			default:
 				AddText (bytes, numBytes);
-				AddText ("A key was pressed!");
 		};
 	}
 	else
