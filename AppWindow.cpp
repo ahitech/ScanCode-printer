@@ -1,6 +1,7 @@
 #include "Application.h"
 
 #include <stdio.h>
+#include <File.h>
 #include <Font.h>
 #include <Rect.h>
 #include <String.h>
@@ -48,13 +49,13 @@ void AppView::AddText (const char* text, int32 numBytes = 0)
 
 void AppView::KeyDown(const char *bytes, int32 numBytes)
 {
-	BMessage *msg;
+	BMessage *msg = Window()->CurrentMessage();
+	
 	if (numBytes == 1)
 	{
 		switch (bytes[0])
 		{
 			case B_FUNCTION_KEY:
-				msg = Window()->CurrentMessage();
 				if ( msg ) {
 					int32 key;
 					char c[100];
@@ -164,6 +165,23 @@ void AppView::KeyDown(const char *bytes, int32 numBytes)
 	else
 	{
 		if (numBytes > 0) {
+			BString receivedString;
+			msg->FindString("bytes", &receivedString);
+			if (receivedString.ICompare("Ĉ") == 0) {
+				AddText("Good string received!");
+				BFile *fileToWrite = new BFile("/boot/home/c-circumflex.msg", B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+				if (B_OK != fileToWrite->InitCheck()) {
+					AddText("Error creating file!");
+				} else {
+					if (B_OK != msg->Flatten(fileToWrite)) {
+						AddText("Error writing to the file!");
+					} else {
+						AddText("Written message successfully!");
+					}
+				}
+				fileToWrite->Unset();
+				delete (fileToWrite);
+			}
 			AddText (bytes, numBytes);
 		}
 	}
